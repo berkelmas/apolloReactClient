@@ -1,6 +1,6 @@
 import React, { Component } from 'react'
 import {gql} from 'apollo-boost';
-import {graphql} from 'react-apollo';
+import {Query, graphql} from 'react-apollo';
 
 const sorgu = gql`
 {
@@ -14,25 +14,21 @@ const sorgu = gql`
 
 class MovieList extends Component {
 
-  veri() {
-    let {loading, director} = this.props.data;
-    if (loading) return <li>Geliyom knk</li>
-     else       return (
-      <div>
-        {director.movies.map((res, index) => <li key={index}>{res.name}</li>)}
-      </div>
-    )
-  }
-
   render() {
       return (
         <div>
           <ul>
-            {this.veri()}
+            <Query query={sorgu} > 
+              {({loading, data, error}) => {
+                if (loading) return <li>Geliyor knk</li>
+                if (error) return <li>Bir Sorun oluştu knk</li>
+                else return <li>{data.director.name }</li>
+              }}
+            </Query>
           </ul>
         </div>
       )
   }
 }
 
-export default graphql(sorgu)(MovieList);
+export default MovieList;
