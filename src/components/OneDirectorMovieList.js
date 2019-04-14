@@ -2,21 +2,22 @@ import React, { Component } from 'react'
 import {gql} from 'apollo-boost';
 import {Query} from 'react-apollo';
 
+const director_id = '5cafd1a9a1e31a3bd82cf8df'
 const sorgu = gql`
 {
-  director(id: "5cafd1a9a1e31a3bd82cf8df") {
+  director(id: "${director_id}") {
     name
     movies{name}
   }
 }
-
 `
 
-class MovieList extends Component {
+class OneDirectorMovieList extends Component {
 
   render() {
       return (
         <div>
+          <h1>Film Listesi</h1>   
           <ul>
             <Query query={sorgu} > 
               {({loading, data, error}) => {
@@ -27,6 +28,7 @@ class MovieList extends Component {
             </Query>
           </ul>
             <Query query={sorgu}>
+
             {({loading, data, error}) => {
               if (loading) return <h2>Getiriom knk</h2>
               if (error) return <h2>Hata var knk bak bi </h2>
@@ -38,4 +40,4 @@ class MovieList extends Component {
   }
 }
 
-export default MovieList;
+export default OneDirectorMovieList;
