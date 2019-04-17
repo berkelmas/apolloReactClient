@@ -1,7 +1,7 @@
 import React, {Component} from 'react';
 import {Query, Mutation} from 'react-apollo';
 
-import {addMovieMutation, getDirectors} from '../queries';
+import {addMovieMutation, getDirectors, getMovies} from '../queries';
 
 class AddMovie extends Component {
   constructor(props) {
@@ -22,7 +22,6 @@ class AddMovie extends Component {
   }
 
   render(){
-    console.log(this.state.director_id);
     return(
       <div>
         <Mutation mutation={addMovieMutation} >
@@ -30,12 +29,14 @@ class AddMovie extends Component {
           <form
             onSubmit={e => {
               e.preventDefault();
-              addMovieFunc({variables:
-                {
+              addMovieFunc({
+                variables:  {
                   name: this.state.name,
                   description: this.state.description,
                   year: parseInt(this.state.year),
-                  director_id: this.state.director_id}
+                  director_id: this.state.director_id
+                },
+                refetchQueries: [{query: getMovies}]
                 }
               );
               // input field larımızı ve statelerimizi tekrar boş hale getirelim.
@@ -47,8 +48,8 @@ class AddMovie extends Component {
               })
             }}
           >
-            <input onChange={this.updateState.bind(this)} value={this.state.name} placeholder="Fİlm Adı" name="name" />
-            <input onChange={this.updateState.bind(this)} value={this.state.year} placeholder="Fİlm Yılı" name="year" />
+            <input onChange={this.updateState.bind(this)} value={this.state.name} placeholder="Film Adı" name="name" />
+            <input onChange={this.updateState.bind(this)} value={this.state.year} placeholder="Film Yılı" name="year" />
             <input onChange={this.updateState.bind(this)} value={this.state.description} placeholder="Film Açıklaması" name="description" />
 
             <select onChange={this.updateState.bind(this)} value={this.state.director_id} name='director_id'>
