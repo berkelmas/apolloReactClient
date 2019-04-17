@@ -1,57 +1,73 @@
-import React, { Component } from 'react'
-import {Query} from 'react-apollo';
-import {gql} from 'apollo-boost';
+import React, {Component} from 'react';
+import {Query, Mutation} from 'react-apollo';
 
-import Select from '@material-ui/core/Select';
-import InputLabel from '@material-ui/core/InputLabel';
-import MenuItem from '@material-ui/core/MenuItem';
-
-const style = {
-    display : 'block',
-    margin : '10px'
-}
-
-const getDirectors = gql`
-{
-    allDirectors {
-      name
-    }
-  }
-`
+import {addMovieMutation, getDirectors} from '../queries';
 
 class AddMovie extends Component {
-  render() {
-    return (
+  constructor(props) {
+    super(props);
+
+    this.state = {
+      name: '',
+      year: '',
+      description: '',
+      director_id: ''
+    }
+  }
+
+  updateState(e) {
+    this.setState({
+      [e.target.name] : e.target.value
+    })
+  }
+
+  render(){
+    console.log(this.state.director_id);
+    return(
       <div>
-        <h2 style={style}>Film Ekle</h2>
-        <form>
-            <input style={style} placeholder='Film Adı'></input>
-            <input style={style} placeholder='Film Yılı'></input>
-            <input style={style} placeholder='Film Açıklaması'></input>
-            <input style={style} placeholder='Film Adı'></input>
-            <Select
-            style={style}
-            inputProps={{
-              name: 'age',
-              id: 'age-simple',
+        <Mutation mutation={addMovieMutation} >
+        {(addMovieFunc, {loading, error, data}) => (
+          <form
+            onSubmit={e => {
+              e.preventDefault();
+              addMovieFunc({variables:
+                {
+                  name: this.state.name,
+                  description: this.state.description,
+                  year: parseInt(this.state.year),
+                  director_id: this.state.director_id}
+                }
+              );
+              // input field larımızı ve statelerimizi tekrar boş hale getirelim.
+              this.setState({
+                name: '',
+                description: '',
+                year: '',
+                director_id: ''
+              })
             }}
-            >
-                <Query query={getDirectors}> 
-                {({loading, data, error}) => {
-                    if (loading) return <li>Geliyom knk</li>
-                    if (error) return <li>Bi sorun var knk</li>
-                    else return data.allDirectors.map((res, index) => <MenuItem key={index}>{res.name}</MenuItem>)
-                }}
-                </Query>
-            </Select>
-            <button style={style} type="submit">Gönder</button>
-        </form>
+          >
+            <input onChange={this.updateState.bind(this)} value={this.state.name} placeholder="Fİlm Adı" name="name" />
+            <input onChange={this.updateState.bind(this)} value={this.state.year} placeholder="Fİlm Yılı" name="year" />
+            <input onChange={this.updateState.bind(this)} value={this.state.description} placeholder="Film Açıklaması" name="description" />
+
+            <select onChange={this.updateState.bind(this)} value={this.state.director_id} name='director_id'>
+              <option value=''>Lütfen Seçim Yapınız...</option>
+            <Query query={getDirectors}>
+              {({data, loading, error}) => {
+                  if (loading) return <option value='deneme'>Geliyor Knk</option>
+                  if (error) return <option value='deneme'>Bi sorun var knk</option>
+                  else return data.allDirectors.map(res => <option value={res.id} key={res.id}>{res.name}</option>)
+              }}
+            </Query>
+            </select>
+            <button type="submit">Film Ekle</button>
+          </form>
+        )}
+        </Mutation>
       </div>
     )
   }
 }
 
-
-
 export default AddMovie;
-

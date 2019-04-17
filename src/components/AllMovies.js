@@ -1,5 +1,4 @@
 import React, { Component } from 'react'
-import {gql} from 'apollo-boost';
 import {Query} from 'react-apollo';
 
 import Table from '@material-ui/core/Table';
@@ -8,22 +7,13 @@ import TableCell from '@material-ui/core/TableCell';
 import TableHead from '@material-ui/core/TableHead';
 import TableRow from '@material-ui/core/TableRow';
 
-const getMovies = gql`
-{
-    allMovies {
-      name
-      description
-      year
-      director{name}
-    }
-  }
-`
+import {getMovies} from '../queries';
 
 class AllMovies extends Component {
   render() {
     return (
       <div>
-              <Table>
+    <Table>
         <TableHead>
           <TableRow>
             <TableCell>Tüm Filmler</TableCell>
@@ -34,33 +24,27 @@ class AllMovies extends Component {
           </TableRow>
         </TableHead>
         <TableBody>
-          
+            <Query query={getMovies} >
+                {({loading, data, error}) => {
+                if (loading) return <TableRow><TableCell>Geliom knk</TableCell></TableRow>
+                if (error) return <TableRow><TableCell>Sorun Var knk</TableCell></TableRow>
+                else return data.allMovies.map((res, index) => (
 
+                        <TableRow key={index}>
+                            <TableCell component="th" scope="row">
+                                #
+                            </TableCell>
+                            <TableCell align="right">{res.name}</TableCell>
+                            <TableCell align="right">{res.director.name}</TableCell>
+                            <TableCell align="right">{res.year}</TableCell>
+                            <TableCell align="right">{res.description}</TableCell>
+                        </TableRow>
 
-                <Query query={getMovies} >
-                    {({loading, data, error}) => {
-                    if (loading) return <TableCell>Geliyom knk</TableCell>
-                    if (error) return <TableCell>Bi sorun var knk</TableCell>
-                    else return data.allMovies.map((res, index) => (
-                        
-                            <TableRow key={index}>
-                                <TableCell component="th" scope="row">
-                                    #
-                                </TableCell>
-                                <TableCell align="right">{res.name}</TableCell>
-                                <TableCell align="right">{res.director.name}</TableCell>
-                                <TableCell align="right">{res.year}</TableCell>
-                                <TableCell align="right">{res.description}</TableCell>
-                            </TableRow>
-                        
-                    ))
-                    }}
-                </Query>
-
-     
-          
+                ))
+                }}
+            </Query>
         </TableBody>
-      </Table>
+    </Table>
 
       </div>
     )
@@ -68,12 +52,3 @@ class AllMovies extends Component {
 }
 
 export default AllMovies;
-
-
-{/* <Query query={getMovies} >
-{({loading, data, error}) => {
-            if (loading) return <li>Geliyom knk</li>
-            if (error) return <li>Bi sorun var knk</li>
-            else return data.allMovies.map((res, index) => <li key={index}>{res.name}</li>)
-        }}
-</Query> */}
